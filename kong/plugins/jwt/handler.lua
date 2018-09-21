@@ -14,6 +14,10 @@ local JwtHandler = BasePlugin:extend()
 JwtHandler.PRIORITY = 1005
 JwtHandler.VERSION = "0.1.0"
 
+local function is_present(str)
+  return str and str ~= "" and str ~= ngx.null
+end
+
 --- Retrieve a JWT in a request.
 -- Checks for the JWT in URI parameters, then in cookies, and finally
 -- in the `Authorization` header.
@@ -201,7 +205,7 @@ function JwtHandler:access(conf)
     return
   end
 
-  if ngx.ctx.authenticated_credential and conf.anonymous ~= "" then
+  if ngx.ctx.authenticated_credential and is_present(conf.anonymous) then
     -- we're already authenticated, and we're configured for using anonymous,
     -- hence we're in a logical OR between auth methods and we're already done.
     return
@@ -209,7 +213,7 @@ function JwtHandler:access(conf)
 
   local ok, err = do_authentication(conf)
   if not ok then
-    if conf.anonymous ~= "" then
+    if is_present(conf.anonymous) then
       -- get anonymous user
       local consumer_cache_key = kong.db.consumers:cache_key(conf.anonymous)
       local consumer, err      = kong.cache:get(consumer_cache_key, nil,

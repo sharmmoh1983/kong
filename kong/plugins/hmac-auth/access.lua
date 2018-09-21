@@ -37,6 +37,7 @@ do
   end
 end
 
+
 local _M = {}
 
 local hmac = {
@@ -61,6 +62,10 @@ local function list_as_set(list)
   end
 
   return set
+end
+
+local function is_present(str)
+  return str and str ~= "" and str ~= ngx.null
 end
 
 local function validate_params(params, conf)
@@ -315,7 +320,7 @@ end
 
 function _M.execute(conf)
 
-  if ngx.ctx.authenticated_credential and conf.anonymous ~= "" then
+  if ngx.ctx.authenticated_credential and is_present(conf.anonymous) then
     -- we're already authenticated, and we're configured for using anonymous,
     -- hence we're in a logical OR between auth methods and we're already done.
     return
@@ -323,7 +328,7 @@ function _M.execute(conf)
 
   local ok, err = do_authentication(conf)
   if not ok then
-    if conf.anonymous ~= "" then
+    if is_present(conf.anonymous) then
       -- get anonymous user
       local consumer_cache_key = kong.db.consumers:cache_key(conf.anonymous)
       local consumer, err      = kong.cache:get(consumer_cache_key, nil,
