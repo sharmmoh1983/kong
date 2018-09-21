@@ -1,7 +1,12 @@
 return {
+  name = "udp-log",
   fields = {
-    host = { required = true, type = "string" },
-    port = { required = true, type = "number" },
-    timeout = { default = 10000, type = "number" }
-  }
+    { config = {
+        type = "record",
+        fields = {
+          { host = { type = "string", required = true }, },
+          { port = { type = "integer", required = true }, },
+          { timeout = { type = "number", default = 10000 }, },
+    }, }, },
+  },
 }
