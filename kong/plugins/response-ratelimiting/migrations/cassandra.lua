@@ -8,7 +8,7 @@ return {
         period text,
         period_date timestamp,
         value counter,
-        PRIMARY KEY ((api_id, identifier, period_date, period))
+        PRIMARY KEY (api_id, identifier, period_date, period)
       );
     ]],
     down = [[
@@ -67,7 +67,7 @@ return {
         period text,
         period_date timestamp,
         value counter,
-        PRIMARY KEY ((route_id, service_id, api_id, identifier, period_date, period))
+        PRIMARY KEY (route_id, service_id, api_id, identifier, period_date, period)
       );
     ]],
     down = nil,
