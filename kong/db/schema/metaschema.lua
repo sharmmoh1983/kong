@@ -62,6 +62,7 @@ local field_schema = {
   { on_delete = { type = "string", one_of = { "restrict", "cascade", "null" } }, },
   { default = { type = "self" }, },
   { abstract = { type = "boolean" }, },
+  { legacy = { type = "boolean" }, },
 }
 
 for _, field in ipairs(validators) do
@@ -187,6 +188,9 @@ local attribute_types = {
     ["integer"] = true,
   },
   uuid = {
+    ["string"] = true,
+  },
+  legacy = {
     ["string"] = true,
   },
   unique = {
