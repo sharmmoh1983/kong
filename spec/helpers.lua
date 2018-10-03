@@ -49,6 +49,7 @@ package.path = CUSTOM_PLUGIN_PATH .. ";" .. package.path
 -- a numerical representation of it.
 -- Ex: 1.11.2.2 -> 11122
 local function openresty_ver_num()
+  collectgarbage() -- collect any stale threads
   local nginx_bin = assert(nginx_signals.find_nginx_bin())
   local _, _, _, stderr = pl_utils.executeex(string.format("%s -V", nginx_bin))
 
