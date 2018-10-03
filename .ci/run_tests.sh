@@ -18,6 +18,12 @@ if [ "$TEST_SUITE" == "integration" ]; then
     eval "$TEST_CMD" spec/02-integration/
 fi
 if [ "$TEST_SUITE" == "plugins" ]; then
+    cat $(which resty) | sed -s 's,^error_log.*level;,,;s,^#error,error,g' > debugresty
+    chmod +x debugresty
+    mv bin/busted bin/busted.bak
+    echo "#!$(pwd)/debugresty" > bin/busted
+    cat bin/busted.bak | grep -v '^#' >> bin/busted
+    chmod +x bin/busted
     eval "$TEST_CMD" spec/03-plugins/
 fi
 if [ "$TEST_SUITE" == "old-integration" ]; then
