@@ -8,7 +8,7 @@ return {
         type = "record",
         nullable = false,
         fields = {
-          { anonymous = { type = "string", uuid = true, len_min = 0 }, },
+          { anonymous = { type = "string", uuid = true, legacy = true }, },
           { hide_credentials = { type = "boolean", default = false }, },
     }, }, },
   },

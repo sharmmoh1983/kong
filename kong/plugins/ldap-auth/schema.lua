@@ -21,7 +21,7 @@ return {
           { hide_credentials = { type = "boolean", default = false }, },
           { timeout = { type = "number", default = 10000 }, },
           { keepalive = { type = "number", default = 60000 }, },
-          { anonymous = { type = "string", uuid = true, len_min = 0 }, },
+          { anonymous = { type = "string", uuid = true, legacy = true }, },
           { header_type = { type = "string", default = "ldap" }, },
         },
     }, },

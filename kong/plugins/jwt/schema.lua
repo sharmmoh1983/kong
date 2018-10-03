@@ -23,7 +23,7 @@ return {
               type = "string",
               one_of = { "exp", "nbf" },
         }, }, },
-        { anonymous = { type = "string", uuid = true, len_min = 0 }, },
+        { anonymous = { type = "string", uuid = true, legacy = true }, },
         { run_on_preflight = { type = "boolean", default = true }, },
         { maximum_expiration = {
           type = "number",

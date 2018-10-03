@@ -16,7 +16,7 @@ return {
               default = { "apikey" },
           }, },
           { hide_credentials = { type = "boolean", default = false }, },
-          { anonymous = { type = "string", uuid = true, len_min = 0 }, },
+          { anonymous = { type = "string", uuid = true, legacy = true }, },
           { key_in_body = { type = "boolean", default = false }, },
           { run_on_preflight = { type = "boolean", default = true }, },
         },
