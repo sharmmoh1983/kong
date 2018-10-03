@@ -112,4 +112,9 @@ function Connector:record_migration()
 end
 
 
+function Connector:is_0_14()
+  return nil, nil, true
+end
+
+
 return Connector

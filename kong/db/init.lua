@@ -726,8 +726,9 @@ do
           self.infos.db_name)
 
       for _, mig in ipairs(t.migrations) do
-        local ok, mod = utils.load_module_if_exists(t.namespace .. "." ..
-                                                    mig.name)
+        local mod
+
+        ok, mod = utils.load_module_if_exists(t.namespace .. "." .. mig.name)
         if not ok then
           return nil, fmt_err(self, "failed to load migration '%s': %s",
                               mig.name, mod)
@@ -739,20 +740,41 @@ do
                               self.strategy, mig.name)
         end
 
+        if mig.name == "000_base" then
+          local is_0_14, err_0_14, is_gt_0_14, missing_0_14_id, missing_0_14_migration =
+            self.connector:is_0_14()
+
+          if err_0_14 then
+            return nil, fmt_err(self, "unable to detect database version (%s) ", err_0_14)
+          end
+
+          if not is_0_14 and not is_gt_0_14 then
+            if missing_0_14_migration then
+              return nil, fmt_err(self, "migration '%s' can only be executed on " ..
+                                  "a %s database that is migrated to version 0.14.x, " ..
+                                  "but database is missing '%s' migration for '%s'",
+                                  mig.name, self.strategy, missing_0_14_migration,
+                                  missing_0_14_id)
+            else
+              return nil, fmt_err(self, "migration '%s' can only be executed on " ..
+                                  "a %s database that is migrated to version 0.14.x, " ..
+                                  "but database is missing '%s'", mig.name, self.strategy,
+                                  missing_0_14_id)
+            end
+          end
+        end
+
         log.debug("running migration: %s", mig.name)
 
         if run_up then
           -- kong migrations bootstrap
           -- kong migrations up
-
-          local ok, err = self.connector:run_up_migration(mig.name,
-                                                          strategy_migration.up)
+          ok, err = self.connector:run_up_migration(mig.name, strategy_migration.up)
           if not ok then
             self.connector:close()
             return nil, fmt_err(self, "failed to run migration '%s' up: %s",
                                 mig.name, err)
           end
-
 
           local state = "executed"
           if strategy_migration.teardown then
@@ -761,8 +783,7 @@ do
             n_pending = n_pending + 1
           end
 
-          local ok, err = self.connector:record_migration(t.subsystem,
-                                                          mig.name, state)
+          ok, err = self.connector:record_migration(t.subsystem, mig.name, state)
           if not ok then
             self.connector:close()
             return nil, fmt_err(self, "failed to record migration '%s': %s",
@@ -774,17 +795,16 @@ do
           -- kong migrations teardown
           local f = strategy_migration.teardown
 
-          local pok, perr, err = xpcall(f, debug.traceback, self.connector,
-                                        mig_helpers)
+          local pok, perr
+          pok, perr, err = xpcall(f, debug.traceback, self.connector, mig_helpers)
+
           if not pok or err then
             self.connector:close()
             return nil, fmt_err(self, "failed to run migration '%s' teardown: %s",
                                 mig.name, perr or err)
-
           end
 
-          local ok, err = self.connector:record_migration(t.subsystem,
-                                                          mig.name, "teardown")
+          ok, err = self.connector:record_migration(t.subsystem, mig.name, "teardown")
           if not ok then
             self.connector:close()
             return nil, fmt_err(self, "failed to record migration '%s': %s",
